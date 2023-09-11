@@ -1,0 +1,24 @@
+
+import lcd
+import sensor
+
+_img = 0	#img
+_blobs = 0	#blobs
+_b = 0	#b
+
+lcd.init(freq=15000000,color=0x0000)
+sensor.reset()
+sensor.set_pixformat(sensor.RGB565)
+sensor.set_framesize(sensor.QVGA)
+sensor.run(1)
+sensor.skip_frames(10)
+sensor.set_auto_gain(False)
+sensor.set_auto_whitebal(False)
+while True:
+	_img = sensor.snapshot()
+	_blobs = _img.find_blobs([(0, 80, -70, -10, 0, 30)], roi=(0, 0, 320, 240), area_threshold=10, pixels_threshold=100, merge=False, margin=0)
+	if _blobs:
+		_b = _blobs[0]
+		_img.draw_rectangle(_b.rect(), (255, 255, 255), thickness=1, fill=False)
+		_img.draw_cross((_b.cx(), _b.cy()), (255, 255, 255), 5, 1)
+	lcd.display(_img)
