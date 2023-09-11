@@ -1,8 +1,28 @@
-lkglhggflhgfkfkfkygfcluglggygyi
-igyudjgfcg
-lutfkgckhg
 
-lygtfytrituyf
-lyglhgluhg;
-ygluhglhglhg
-gluhghb
+import lcd
+import sensor
+import KPU
+
+_task = 0	#task
+_anchor = 0	#anchor
+_a = 0	#a
+_img = 0	#img
+_code = 0	#code
+_b = 0	#b
+
+lcd.init(freq=15000000,color=0x0000)
+sensor.reset()
+sensor.set_pixformat(sensor.RGB565)
+sensor.set_framesize(sensor.QVGA)
+sensor.run(1)
+sensor.skip_frames(10)
+_task = KPU.load("/sd/facedetect.kmodel")
+_anchor = (1.889, 2.5245, 2.9465, 3.94056, 3.99987, 5.3658, 5.155437, 6.92275, 6.718375, 9.01025)
+_a = KPU.init_yolo2(_task, 0.5, 0.3, 5, _anchor)
+while True:
+	_img = sensor.snapshot()
+	_code = KPU.run_yolo2(_task, _img)
+	if _code:
+		_b = _code[0]
+		_img.draw_rectangle(_b.rect(), (255, 255, 255), thickness=1, fill=False)
+	lcd.display(_img)
